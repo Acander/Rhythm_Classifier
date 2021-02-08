@@ -65,9 +65,18 @@ def load_samples(class_size=None, n_classes=len(folder_names)):
                     break
             music_sample, _ = load_sample(data_set_folder + folder_names[i] + "/" + filename)
             dance_class.append(np.array(music_sample))
-        dataset.append(dance_class)
+        save_samples_to_text(np.array(dance_class), folder_names[i])
+        dataset.append(np.array(dance_class))
 
-    print(np.array(dataset))
+
+def save_samples_to_text(dataset, class_name):
+    print(dataset)
+    np.save(class_name, dataset)
+
+
+def load_samples_from_text(class_name):
+    dataset = np.load(class_name + '.npy')
+    print(dataset)
     return dataset
 
 
@@ -79,3 +88,4 @@ def test_load():
 
 if __name__ == '__main__':
     dataset = load_samples(class_size=4, n_classes=2)
+    load_samples_from_text(folder_names[1])
