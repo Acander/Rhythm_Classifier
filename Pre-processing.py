@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import madmom as mm
-import librosa as lib
 import dataHandler as dh
 import scipy.signal as sps
 
@@ -38,7 +37,7 @@ def gen_tempogram(sample):
     sf_sample_rate = len(
         sf) / sample_len  # Divde the sample length (in seconds) by n points in the spectral flux to get spectral flux sample_rate. (Inverse)
     print(sf_sample_rate * sample_len)
-    plot_waveform(sf, sample_rate=sf_sample_rate, title="Spectral Flux")
+    # plot_waveform(sf, sample_rate=sf_sample_rate, title="Spectral Flux")
     tempogram = fourier_transform(sf, sf_sample_rate)
     return tempogram
 
@@ -71,6 +70,17 @@ def hertz_to_tempo(frequencies):
 
 
 if __name__ == '__main__':
-    dataset = load_samples_from_text(dh.FOLDER_NAMES[0])
-    plot_waveform(dataset[0], sample_rate=dh.SAMPLE_RATE, title=dh.FOLDER_NAMES[0])
-    gen_tempogram(sample=dataset[0])
+    chachas = load_samples_from_text(dh.FOLDER_NAMES[0])
+    foxtrots = load_samples_from_text(dh.FOLDER_NAMES[1])
+    # plot_waveform(chachas[0], sample_rate=dh.SAMPLE_RATE, title=dh.FOLDER_NAMES[0])
+    gen_tempogram(sample=chachas[0])
+    gen_tempogram(sample=chachas[1])
+    gen_tempogram(sample=chachas[2])
+    gen_tempogram(sample=chachas[3])
+    gen_tempogram(sample=foxtrots[0])
+    gen_tempogram(sample=foxtrots[1])
+    gen_tempogram(sample=foxtrots[2])
+    gen_tempogram(sample=foxtrots[3])
+
+    
+
