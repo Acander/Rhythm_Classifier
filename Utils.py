@@ -25,14 +25,22 @@ def plot_waveform(samples, title, sample_rate=0.0):
     plt.show()
 
 
-def plot_spectrogram(magnitudes, x, y, title, x_label, y_label):
+def plot_fourier_spectrogram(magnitudes, x, y, title, x_label, y_label, lim=True):
     cmap = plt.get_cmap('copper')
-    plt.ylim([0, 5000])
+    if lim:
+        plt.ylim([0, 5000])
     plt.pcolormesh(x, y, magnitudes, cmap=cmap)
     plt.set_cmap(cmap)
     plt.title(title)
     plt.ylabel(y_label)
     plt.xlabel(x_label)
+    plt.show()
+
+
+def plot_spectrogram(magnitudes):
+    cmap = plt.get_cmap('copper')
+    plt.pcolormesh(magnitudes, cmap=cmap)
+    plt.set_cmap(cmap)
     plt.show()
 
 
