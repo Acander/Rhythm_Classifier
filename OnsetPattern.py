@@ -8,6 +8,9 @@ import scipy.signal as sps
 import Utils
 import librosa
 
+
+###################################################
+
 SAMPLE_TIME_SEC = 30
 
 WIN_SIZE_1 = int(dh.SAMPLE_RATE * 0.00464)
@@ -23,8 +26,11 @@ NBINS = 5
 
 COMPRESSION_2 = 8
 
+###################################################
+
+
 def load_samples_from_text(class_name):
-    dataset = np.load(class_name + '.npy')
+    dataset = np.load('Raw_Waveforms/' + class_name + '.npy')
     return dataset
 
 
@@ -44,7 +50,7 @@ def mel_spectrogram(sample):
 
 def filter_bank_processing(sample):
     freq, time, magnitudes = short_time_fourier_transform(np.array(sample), dh.SAMPLE_RATE, WIN_SIZE_1, HOP_SIZE_1)
-    magnitudes = np.dot(mm.audio.filters.LogFilterbank(freq, num_bands=12).transpose(), magnitudes)
+    magnitudes = np.dot(mm.audio.filters.LogFilterbank(freq, num_bands=12).transpose(), magnitudes) # Switch place?
     compressed_spectrogram = compression(magnitudes, N_BANDS_1)
     log_S = librosa.power_to_db(np.array(compressed_spectrogram), ref=np.max)
     return log_S
@@ -101,18 +107,23 @@ def periodicity_spectrum(compressed_spectrogram):
 
     return periodicity_spectrogram
 
-if __name__ == '__main__':
+
+def plot_spectrogram():
+    Utils.plot_spectrogram(log_S)
+    Utils.plot_spectrogram(masked_spectrogram)
+    Utils.plot_spectrogram(periodicity_spectrogram)
+
+def generate_onset_patterns():
     chachas = load_samples_from_text(dh.FOLDER_NAMES[0])
-    # Utils.plot_waveform(chachas[0], title="A simple chacha", sample_rate=dh.SAMPLE_RATE)
-    # freq, time, stft = fourier_transform(chachas[0], sample_rate=dh.SAMPLE_RATE)
-    # Utils.plot_spectrogram(librosa.amplitude_to_db(stft, ref=np.max), time, freq, "Fourier", "time", "frequency")
     log_S = log_stft_1(chachas[0])
-    # Utils.plot_mel_spectrogram(log_S, dh.SAMPLE_RATE, HOP_SIZE)
     Utils.plot_spectrogram(log_S)
     masked_spectrogram = unsharp_mask(log_S)
     Utils.plot_spectrogram(masked_spectrogram)
-    # compressed_spectrogram = compression(masked_spectrogram, 38)
     periodicity_spectrogram = periodicity_spectrum(masked_spectrogram)
     Utils.plot_spectrogram(periodicity_spectrogram)
     compressed_periodicity = compression(periodicity_spectrogram, COMPRESSION_2)
     Utils.plot_spectrogram(compressed_periodicity)
+
+
+if __name__ == '__main__':
+    generate_onset_patterns()

@@ -50,7 +50,7 @@ def load_samples(class_size=None, n_classes=len(FOLDER_NAMES)):
             music_sample, _ = load_sample(DATA_SET_HANDLER + FOLDER_NAMES[i] + "/" + filename)
             dance_class.append(np.array(music_sample))
         save_samples_to_text(np.array(dance_class), FOLDER_NAMES[i])
-        dataset.append(np.array(dance_class))
+        # dataset.append(np.array(dance_class))
 
 
 def save_samples_to_text(dataset, class_name):
@@ -65,4 +65,5 @@ def test_load():
 
 
 if __name__ == '__main__':
-    dataset = load_samples(class_size=4, n_classes=2)
+    # dataset = load_samples(class_size=4, n_classes=len(FOLDER_NAMES))
+    dataset = load_samples()

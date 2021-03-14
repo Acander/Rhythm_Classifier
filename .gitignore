@@ -128,4 +128,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Application-specific ignores
 extendedballroom_v1.1/
+Raw_Waveforms/
