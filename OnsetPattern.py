@@ -11,6 +11,7 @@ import librosa
 
 ###################################################
 
+min_sample_size = 661248
 SAMPLE_TIME_SEC = 30
 
 WIN_SIZE_1 = int(dh.SAMPLE_RATE * 0.00464)
@@ -26,12 +27,25 @@ NBINS = 5
 
 COMPRESSION_2 = 8
 
+
+ONSET_PATTERN_FINAL_SHAPE = (8, 62)
+
+
 ###################################################
 
 
 def load_samples_from_text(class_name):
-    dataset = np.load('Raw_Waveforms/' + class_name + '.npy')
+    dataset = np.load('Raw_Waveforms/' + class_name + '.npy', allow_pickle=True)
     return dataset
+
+
+def load_onset_patterns_from_text(class_name):
+    dataset = np.load('Onset_Patterns/' + class_name + '.npy', allow_pickle=True)
+    return dataset
+
+
+def save_onsets_to_text(dataset, class_name):
+    np.save('Onset_Patterns/' + class_name, dataset)
 
 
 def short_time_fourier_transform(waveform, sample_rate, win_size, hop_size):
@@ -50,14 +64,13 @@ def mel_spectrogram(sample):
 
 def filter_bank_processing(sample):
     freq, time, magnitudes = short_time_fourier_transform(np.array(sample), dh.SAMPLE_RATE, WIN_SIZE_1, HOP_SIZE_1)
-    magnitudes = np.dot(mm.audio.filters.LogFilterbank(freq, num_bands=12).transpose(), magnitudes) # Switch place?
+    magnitudes = np.dot(mm.audio.filters.LogFilterbank(freq, num_bands=12).transpose(), magnitudes)
     compressed_spectrogram = compression(magnitudes, N_BANDS_1)
     log_S = librosa.power_to_db(np.array(compressed_spectrogram), ref=np.max)
     return log_S
 
 
 def log_stft_1(sample):
-    # return mel_spectrogram(sample)
     return filter_bank_processing(sample)
 
 
@@ -108,22 +121,58 @@ def periodicity_spectrum(compressed_spectrogram):
     return periodicity_spectrogram
 
 
-def plot_spectrogram():
+def plot_spectrogram(log_S, masked_spectrogram, periodicity_spectrogram, compressed_periodicity):
     Utils.plot_spectrogram(log_S)
     Utils.plot_spectrogram(masked_spectrogram)
     Utils.plot_spectrogram(periodicity_spectrogram)
+    Utils.plot_spectrogram(compressed_periodicity)
 
-def generate_onset_patterns():
+
+def generate_onset_patterns_test():
     chachas = load_samples_from_text(dh.FOLDER_NAMES[0])
     log_S = log_stft_1(chachas[0])
     Utils.plot_spectrogram(log_S)
     masked_spectrogram = unsharp_mask(log_S)
-    Utils.plot_spectrogram(masked_spectrogram)
     periodicity_spectrogram = periodicity_spectrum(masked_spectrogram)
-    Utils.plot_spectrogram(periodicity_spectrogram)
     compressed_periodicity = compression(periodicity_spectrogram, COMPRESSION_2)
-    Utils.plot_spectrogram(compressed_periodicity)
+    plot_spectrogram(log_S, masked_spectrogram, periodicity_spectrogram, compressed_periodicity)
+
+
+def generate_onset_patterns():
+    for class_name in dh.FOLDER_NAMES:
+        print(class_name)
+        class_periodicities = []
+        samples = load_samples_from_text(class_name)
+        for i, sample in enumerate(samples):
+            sample = sample[0:min_sample_size]
+            print("Currently computing sample: ", i, "/", len(samples))
+            log_S = log_stft_1(sample)
+            masked_spectrogram = unsharp_mask(log_S)
+            periodicity_spectrogram = periodicity_spectrum(masked_spectrogram)
+            compressed_periodicity = compression(periodicity_spectrogram, COMPRESSION_2)
+            class_periodicities.append(np.array(compressed_periodicity).flatten())
+        save_onsets_to_text(np.array(class_periodicities), class_name)
+
+
+def load_test():
+    onset_patterns = load_onset_patterns_from_text(dh.FOLDER_NAMES[0])
+    for i, onset_pattern in enumerate(onset_patterns):
+        print(np.shape(onset_pattern))
+        Utils.plot_spectrogram(np.reshape(onset_pattern, ONSET_PATTERN_FINAL_SHAPE))
+
+
+def find_shortest_piece():
+    shortest_piece_len = np.Infinity
+    for class_name in dh.FOLDER_NAMES:
+        samples = load_samples_from_text(class_name)
+        for i, sample in enumerate(samples):
+            if len(sample) < shortest_piece_len:
+                shortest_piece_len = len(sample)
+    print(shortest_piece_len)
 
 
 if __name__ == '__main__':
-    generate_onset_patterns()
+    # generate_onset_patterns_test()
+    # generate_onset_patterns()
+    find_shortest_piece()
+    # load_test()
