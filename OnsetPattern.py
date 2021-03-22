@@ -54,20 +54,20 @@ def short_time_fourier_transform(waveform, sample_rate, win_size, hop_size):
     magnitudes = np.abs(stft)
     return freq, time, magnitudes
 
-
+"""
 def mel_spectrogram(sample):
     S = librosa.feature.melspectrogram(np.array(sample), sr=dh.SAMPLE_RATE, n_mels=85, n_fft=8192, window='hann',
                                        win_length=WIN_SIZE_1, hop_length=HOP_SIZE_1)
     log_S = librosa.power_to_db(S, ref=np.max)
     return log_S
-
+"""
 
 def filter_bank_processing(sample):
     freq, time, magnitudes = short_time_fourier_transform(np.array(sample), dh.SAMPLE_RATE, WIN_SIZE_1, HOP_SIZE_1)
     magnitudes = np.dot(mm.audio.filters.LogFilterbank(freq, num_bands=12).transpose(), magnitudes)
     compressed_spectrogram = compression(magnitudes, N_BANDS_1)
-    log_S = librosa.power_to_db(np.array(compressed_spectrogram), ref=np.max)
-    return log_S
+    # log_S = librosa.power_to_db(np.array(compressed_spectrogram), ref=np.max)
+    return compressed_spectrogram
 
 
 def log_stft_1(sample):
@@ -129,9 +129,8 @@ def plot_spectrogram(log_S, masked_spectrogram, periodicity_spectrogram, compres
 
 
 def generate_onset_patterns_test():
-    chachas = load_samples_from_text(dh.FOLDER_NAMES[0])
+    chachas = load_samples_from_text(dh.FOLDER_NAMES[1])
     log_S = log_stft_1(chachas[0])
-    Utils.plot_spectrogram(log_S)
     masked_spectrogram = unsharp_mask(log_S)
     periodicity_spectrogram = periodicity_spectrum(masked_spectrogram)
     compressed_periodicity = compression(periodicity_spectrogram, COMPRESSION_2)
@@ -172,7 +171,7 @@ def find_shortest_piece():
 
 
 if __name__ == '__main__':
-    # generate_onset_patterns_test()
+    generate_onset_patterns_test()
     # generate_onset_patterns()
-    find_shortest_piece()
+    # find_shortest_piece()
     # load_test()

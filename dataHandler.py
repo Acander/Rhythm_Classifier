@@ -39,7 +39,6 @@ def load_sample(filename, time_s=None):
 
 
 def load_samples(class_size=None, n_classes=len(FOLDER_NAMES)):
-    dataset = []
     for i in range(n_classes):
         print("Loading class: " + str(i))
         dance_class = []

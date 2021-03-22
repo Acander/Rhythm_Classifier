@@ -9,35 +9,21 @@ import OnsetPattern
 
 # Here we use a KNN classifier for distinguishing the different rhythms.
 
-"""
-455
-507
-350
-53
-497
-470
-47
-468
-65
-464
-252
-529
-23
-"""
 
-"Chacha"
-"Foxtrot"
-"Jive"
-"Pasodoble"
-"Quickstep"
-"Rumba"
-"Salsa"
-"Samba"
-"Slowwaltz"
-"Tango"
-"Viennesewaltz"
-"Waltz"
-"Wcswing"
+# Number of samples per class.
+"Chacha - 455"
+"Foxtrot - 507"
+"Jive - 350"
+"Pasodoble - 53"
+"Quickstep - 497"
+"Rumba - 470"
+"Salsa - 47"
+"Samba - 468"
+"Slowwaltz - 65"
+"Tango - 464"
+"Viennesewaltz - 252"
+"Waltz - 529"
+"Wcswing - 23"
 
 
 TEST_PARTION = 0.2
@@ -58,12 +44,11 @@ def get_train_data():
         if MIN_LEN <= len(onset_pattern_samples):
             print(class_name)
             onset_pattern_samples = onset_pattern_samples[0:MIN_LEN]
-            #print(len(onset_pattern_samples))
             for j, sample in enumerate(onset_pattern_samples):
                 x.append(sample)
                 y.append(i)
-                # if j == 0:
-                #    Utils.plot_spectrogram(np.reshape(sample, OnsetPattern.ONSET_PATTERN_FINAL_SHAPE))
+                #if j == 0:
+                #     Utils.plot_spectrogram(np.reshape(sample, OnsetPattern.ONSET_PATTERN_FINAL_SHAPE))
     return x, y
 
 
